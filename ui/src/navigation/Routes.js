@@ -22,30 +22,30 @@ const Home = () => (
 
 const Dems = () => (
     <div>
-        <Senators match="dems"/>
+        <Senators match="party/dems"/>
     </div>
 )
 
 const Repubs = () => (
     <div>
-        <Senators match="repubs"/>
+        <Senators match="party/repubs"/>
     </div>
 )
 
 const Indies = () => (
     <div>
-        <Senators match="indies"/>
+        <Senators match="party/Independent"/>
     </div>
 )
 
 const Males = () => (
     <div>
-        <Senators match="males"/>
+        <Senators match="gender/male"/>
     </div>
 )
 
 const Females = () => (
     <div>
-        <Senators match="females"/>
+        <Senators match="gender/female"/>
     </div>
 )

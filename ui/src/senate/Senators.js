@@ -7,7 +7,7 @@ export default class extends Component {
         super(props)
         this.state = {
             senate: [],
-            url: "https://micro-example-tbcyrywnrw.now.sh/" + this.props.match
+            url: "https://micro-example-edmwondvmp.now.sh/" + this.props.match
         }
     }
 

@@ -1,53 +1,64 @@
-const { send } = require('micro');
-const { router, get } = require('microrouter');
-const Senators = require('./data/senators');
+const{send, } = require('micro');
+const {router, get, post} = require('microrouter');
+const monk = require('monk');
 
-const democrats = () => {
-    return Senators.filter(senator => senator.party === 'Democrat')
-};
-const republicans = () => {
-    return Senators.filter(senator => senator.party === 'Republican')
-};
-const independents = () => {
-    return Senators.filter(senator => senator.party === 'Independent')
-};
-const males = () => {
-    return Senators.filter(senator => senator.person.gender === 'male')
-};
-const females = () => {
-    return Senators.filter(senator => senator.person.gender === 'female')
-};
+const url = 'heliopeep:passw0rd@ds135399.mlab.com:35399/helio';
+const db = monk(url);
+const collection = db.get('Senators');
 
-const hello = (req, res) => send(res, 200, `Hello ${req.params.who}`);
-const dems = (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    return send(res, 200, democrats());
-}
-const repubs = (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    return send(res, 200, republicans());
-}
-const indies = (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    return send(res, 200, independents());
-}
-const men = (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    return send(res, 200, males());
-}
-const women = (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    return send(res, 200, females());
-}
-
-const notfound = (req, res) => send(res, 404, 'Not found route');
+db.then(()=>{
+    console.log('connected correctly to server');
+})
 
 module.exports = router(
-    get('/repubs', repubs),
-    get('/dems', dems),
-    get('/indies', indies),
-    get('/males', men),
-    get('/females', women),
-    get('/hello/:who', hello),
-    get('/*', notfound)
-);
+    get('/party/:party', getByParty),
+    get('/gender/:gender', getByGender)
+)
+
+const getByParty = (async (req, res) => {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    //this works maybe make a switch statment to check the case of what to then
+    //specify how we are going to search or even send a second value to decide
+    let filter = req.params.party;
+    filter = switchRepubs(filter)
+    if(dems.includes(filter.toLowerCase())){
+        filter = "Democrat"
+    }
+    let dataToSend = await collection.find({party: filter}).then((docs)=> docs)
+
+
+    send(res,200, dataToSend);
+    //console.log(dataToSend);
+})
+
+const getByGender = (async (req, res) => {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    //this works maybe make a switch statment to check the case of what to then
+    //specify how we are going to search or even send a second value to decide
+    let filter = req.params.gender;
+    let dataToSend = await collection.find({"person.gender": filter}).then((docs)=> docs)
+
+
+    send(res,200, dataToSend);
+    //console.log(dataToSend);
+})
+
+//so do I need to create multiple routs with those values I want to search?
+
+const dems = [ "dems", "dem", "democrat", "democrats" ]
+const switchRepubs = (userData) => {
+    switch (userData.toLowerCase()){
+        case "repubs":
+            return "Republican"
+        case "repub":
+            return "Republican"
+        case "republicans":
+            return "Republican"
+        case "republican":
+            return "Republican"
+        default:
+            return userData
+    }
+}
